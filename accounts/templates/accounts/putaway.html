@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Putaway Module</title>
+
+  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="brand">
+      <i class="fa-solid fa-boxes-stacked"></i>
+      <span>Putaway</span>
+    </div>
+
+    <nav class="menu">
+  <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+  <a href="{% url 'receiving' %}" class="{% if request.resolver_match.url_name == 'receiving' %}active{% endif %}"><i class="fa-solid fa-truck-ramp-box"></i> Receiving</a>
+  <a href="{% url 'putaway' %}" class="{% if request.resolver_match.url_name == 'putaway' %}active{% endif %}"><i class="fa-solid fa-boxes-stacked"></i> Putaway</a>
+  <a href="{% url 'inventory' %}" class="{% if request.resolver_match.url_name == 'inventory' %}active{% endif %}"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+  <a href="{% url 'picking' %}" class="{% if request.resolver_match.url_name == 'picking' %}active{% endif %}"><i class="fa-solid fa-hand-pointer"></i> Picking</a>
+  <a href="{% url 'packing' %}" class="{% if request.resolver_match.url_name == 'packing' %}active{% endif %}"><i class="fa-solid fa-box"></i> Packing</a>
+  <a href="{% url 'shipping' %}" class="{% if request.resolver_match.url_name == 'shipping' %}active{% endif %}"><i class="fa-solid fa-truck-fast"></i> Shipping</a>
+  <form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </form>
+</nav>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <h2>Putaway Management</h2>
+      <p>Assign storage locations for incoming goods</p>
+    </header>
+
+    <!-- FORM -->
+    <section class="panel">
+
+      <h3>Store Received Goods</h3>
+
+      {% if messages %}
+        {% for message in messages %}
+          <p class="msg">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+
+     <form method="POST">
+    {% csrf_token %}
+
+    <label>Received Product</label>
+    {{ form.receiving }}
+
+    <label>Storage Location</label>
+    {{ form.location }}
+
+    <button type="submit">Save Putaway</button>
+</form>
+
+    </section>
+
+    <!-- TABLE -->
+    <section class="panel">
+
+      <h3>Putaway Records</h3>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Qty</th>
+            <th>Location</th>
+            <th>Condition</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for p in records %}
+          <tr>
+            <td>{{ p.receiving.product_name }}</td>
+            <td>{{ p.receiving.sku }}</td>
+            <td>{{ p.receiving.quantity }}</td>
+            <td>{{ p.location }}</td>
+            <td>{{ p.receiving.get_condition_display }}</td>
+            <td>{{ p.status }}</td>
+            <td>{{ p.created_at }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">No putaway records found</td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+  </main>
+
+</div>
+
+</body>
+</html>

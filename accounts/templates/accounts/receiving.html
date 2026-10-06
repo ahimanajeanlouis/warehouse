@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Receiving Module</title>
+
+  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <i class="fa-solid fa-truck-ramp-box"></i>
+      <span>Receiving</span>
+    </div>
+
+    <nav class="menu">
+  <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+  <a href="{% url 'receiving' %}" class="{% if request.resolver_match.url_name == 'receiving' %}active{% endif %}"><i class="fa-solid fa-truck-ramp-box"></i> Receiving</a>
+  <a href="{% url 'putaway' %}" class="{% if request.resolver_match.url_name == 'putaway' %}active{% endif %}"><i class="fa-solid fa-boxes-stacked"></i> Putaway</a>
+  <a href="{% url 'inventory' %}" class="{% if request.resolver_match.url_name == 'inventory' %}active{% endif %}"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+  <a href="{% url 'picking' %}" class="{% if request.resolver_match.url_name == 'picking' %}active{% endif %}"><i class="fa-solid fa-hand-pointer"></i> Picking</a>
+  <a href="{% url 'packing' %}" class="{% if request.resolver_match.url_name == 'packing' %}active{% endif %}"><i class="fa-solid fa-box"></i> Packing</a>
+  <a href="{% url 'shipping' %}" class="{% if request.resolver_match.url_name == 'shipping' %}active{% endif %}"><i class="fa-solid fa-truck-fast"></i> Shipping</a>
+  <form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </form>
+</nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <h2>Goods Receiving Module</h2>
+    </header>
+
+    <!-- FORM -->
+    <section class="panel">
+
+      <h3 >Add Incoming Goods</h3>
+
+      {% if messages %}
+        {% for message in messages %}
+          <p class="msg">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+
+        <label>Product Name</label>
+        {{ form.product_name }}
+        {% if form.product_name.errors %}
+          <div class="error">{{ form.product_name.errors }}</div>
+        {% endif %}
+
+        <label>SKU</label>
+        {{ form.sku }}
+        {% if form.sku.errors %}
+          <div class="error">{{ form.sku.errors }}</div>
+        {% endif %}
+
+        <label>Quantity</label>
+        {{ form.quantity }}
+        {% if form.quantity.errors %}
+          <div class="error">{{ form.quantity.errors }}</div>
+        {% endif %}
+
+        <label>Unit Price</label>
+        {{ form.unit_price }}
+        {% if form.unit_price.errors %}
+          <div class="error">{{ form.unit_price.errors }}</div>
+        {% endif %}
+
+        <label>Supplier</label>
+        {{ form.supplier }}
+        {% if form.supplier.errors %}
+          <div class="error">{{ form.supplier.errors }}</div>
+        {% endif %}
+
+        <label>Expiry Date</label>
+        {{ form.expiry_date }}
+        {% if form.expiry_date.errors %}
+          <div class="error">{{ form.expiry_date.errors }}</div>
+        {% endif %}
+
+        <label>Condition</label>
+        {{ form.condition }}
+        {% if form.condition.errors %}
+          <div class="error">{{ form.condition.errors }}</div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+          <div class="error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <button type="submit">Receive Goods</button>
+      </form>
+
+    </section>
+
+    <!-- TABLE -->
+    <section class="panel">
+
+      <h3>Receiving History</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total Price</th>
+            <th>Condition</th>
+            <th>Supplier</th>
+            <th>Received Date</th>
+            <th>Expiry Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for r in records %}
+          <tr>
+            <td>{{ r.product_name }}</td>
+            <td>{{ r.sku }}</td>
+            <td>{{ r.quantity }}</td>
+            <td>{{ r.unit_price }}</td>
+            <td>{{ r.total_price }}</td>
+            <td>{{ r.get_condition_display }}</td>
+            <td>{{ r.supplier }}</td>
+            <td>{{ r.received_date }}</td>
+            <td>{{ r.expiry_date }}</td>  
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+
+    </section>
+
+  </main>
+
+</div>
+
+</body>
+</html>

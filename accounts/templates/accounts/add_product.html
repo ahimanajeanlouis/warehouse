@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Product</title>
+
+  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<div class="form-container">
+
+  <div class="form-box">
+
+    <h2><i class="fa-solid fa-box"></i> Add Product</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <p class="msg">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <label>Product Name</label>
+      {{ form.name }}
+
+      <label>SKU</label>
+      {{ form.sku }}
+
+      <label>Quantity</label>
+      {{ form.quantity }}
+
+      <button type="submit">Save Product</button>
+
+    </form>
+
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+
+  </div>
+
+</div>
+
+</body>
+</html>

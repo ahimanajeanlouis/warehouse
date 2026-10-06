@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Warehouse Operations Dashboard</title>
+
+  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="brand">
+      <i class="fa-solid fa-warehouse"></i>
+      <span>WMS System</span>
+    </div>
+
+    <nav class="menu">
+      <a class="active" href="{% url 'dashboard' %}">Dashboard</a>
+      
+      <a href="{% url 'receiving' %}">Receiving</a>
+      <a href="{% url 'putaway' %}">Putaway</a>
+      <a href="{% url 'inventory' %}">Inventory</a>
+      <a href="{% url 'picking' %}">Picking</a>
+      <a href="{% url 'packing' %}">Packing</a>
+      <a href="{% url 'shipping' %}">Shipping</a>
+
+      <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </form>
+    </nav>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div>
+        <h2>Warehouse Operations</h2>
+        <p>Real-time warehouse activity monitoring</p>
+      </div>
+
+      <div class="profile">
+        <i class="fa-solid fa-user"></i>
+        {{ request.user.username }}
+      </div>
+    </header>
+
+    <!-- 6 CORE OPERATIONS -->
+    <section class="ops-grid">
+
+      <div class="op-card">
+        <i class="fa-solid fa-truck-ramp-box"></i>
+        <h3>{{ receiving }}</h3>
+        <p>Receiving</p>
+        <span>Inbound Goods</span>
+      </div>
+
+      <div class="op-card">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <h3>{{ putaway }}</h3>
+        <p>Putaway</p>
+        <span>Storage Tasks</span>
+      </div>
+
+      <div class="op-card">
+        <i class="fa-solid fa-warehouse"></i>
+        <h3>{{ inventory }}</h3>
+        <p>Inventory</p>
+        <span>Total Stock Items</span>
+      </div>
+
+      <div class="op-card">
+        <i class="fa-solid fa-hand-pointer"></i>
+        <h3>{{ picking }}</h3>
+        <p>Picking</p>
+        <span>Orders in Process</span>
+      </div>
+
+      <div class="op-card">
+        <i class="fa-solid fa-box"></i>
+        <h3>{{ packing }}</h3>
+        <p>Packing</p>
+        <span>Ready for Packing</span>
+      </div>
+
+      <div class="op-card">
+        <i class="fa-solid fa-shipping-fast"></i>
+        <h3>{{ shipping }}</h3>
+        <p>Shipping</p>
+        <span>Outbound Deliveries</span>
+      </div>
+
+    </section>
+
+    <!-- ========================= -->
+    <!-- FEFO EXPIRY ALERTS (NEW) -->
+    <!-- ========================= -->
+    <section class="panel">
+
+      <div class="panel-header">
+        <h3>⚠ Expiry Alerts (FEFO System)</h3>
+      </div>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Quantity</th>
+            <th>Expiry Date</th>
+            
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for b in expiring_batches %}
+
+          <tr class="{{ b.row_class }}">
+            <td>{{ b.product_name }}</td>
+            <td>{{ b.sku }}</td>
+            <td>{{ b.quantity }}</td>
+            <td>{{ b.expiry_date }}</td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="4">No expiring products 🎉</td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+    <!-- ACTIVITY TABLE -->
+    <section class="panel">
+
+      <div class="panel-header">
+        <h3>Live Warehouse Activity Log</h3>
+      </div>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Reference</th>
+            <th>Status</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for a in activities %}
+
+          <tr>
+            <td>{{ a.activity_type }}</td>
+            <td>{{ a.reference }}</td>
+
+            <td>
+              <span class="badge
+                {% if a.status == 'COMPLETED' %}success
+                {% elif a.status == 'IN_PROGRESS' %}warning
+                {% elif a.status == 'DELAYED' %}danger
+                {% else %}warning{% endif %}">
+                {{ a.status }}
+              </span>
+            </td>
+
+            <td>{{ a.created_at }}</td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="4">No activities found</td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+  </main>
+
+</div>
+
+</body>
+</html>

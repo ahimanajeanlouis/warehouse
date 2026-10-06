@@ -1,0 +1,127 @@
+<!-- index.html -->
+ {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Warehouse Management System</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}" >
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- LEFT SIDE -->
+    <div class="left-side">
+      <div class="overlay">
+        <h1>Warehouse Management</h1>
+        <p>
+          Manage inventory, track products, monitor stock,
+          and control warehouse operations efficiently.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <i class="fa-solid fa-box"></i>
+            <span>Inventory Tracking</span>
+          </div>
+
+          <div class="feature">
+            <i class="fa-solid fa-truck"></i>
+            <span>Shipment Management</span>
+          </div>
+
+          <div class="feature">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Real-Time Reports</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-side">
+
+      <form class="login-form" method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <div class="logo">
+          <i class="fa-solid fa-warehouse"></i>
+          <h2>WMS Login</h2>
+        </div>
+
+        <h3>Welcome Back</h3>
+        <p class="subtitle">
+          Sign in to continue to your dashboard
+        </p>
+
+      <div class="input-group">
+  <label>Username</label>
+
+  <div class="input-box">
+    <i class="fa-solid fa-user"></i>
+
+    <input
+      type="text"
+      name="username"
+      placeholder="Enter your username"
+      required
+    />
+  </div>
+</div>
+
+<div class="input-group">
+  <label>Password</label>
+
+  <div class="input-box">
+    <i class="fa-solid fa-lock"></i>
+
+    <input
+      type="password"
+      name="password"
+      placeholder="Enter your password"
+      required
+    />
+  </div>
+</div>
+
+        <div class="options">
+          <label>
+            <input type="checkbox" />
+            Remember me
+          </label>
+
+          <span class="forgot-note">Contact your administrator if you need a password reset.</span>
+        </div>
+
+
+        <button type="submit" class="login-btn">
+          Login
+        </button>
+
+        <p class="register-text">
+          Don't have an account?
+          <a href="{% url 'register' %}">
+            Register
+          </a>
+        </p>
+
+        <p class="footer-text">
+          © 2026 Warehouse Management System
+        </p>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
