@@ -11,7 +11,7 @@ A complete beginner-friendly warehouse workflow:
 - Dashboard with operation counts and activity log
 - FEFO-style expiry alerts
 - Product/inventory management
-- Receiving that automatically updates usable inventory
+- Putaway of good-condition received goods automatically updates usable inventory
 - Putaway tracking and storage locations
 - Picking with SKU validation and stock checking
 - Picking reduces available inventory so stock cannot go negative
@@ -43,9 +43,9 @@ http://127.0.0.1:8000/
 
 1. Register a normal user.
 2. Login.
-3. Add a product, or receive goods using an SKU.
-4. Receiving good-condition goods automatically increases inventory.
-5. Put the received batch into a storage location.
+3. Receive goods using a product name and SKU.
+4. In Putaway, select the good-condition received goods and assign a storage location.
+5. Inventory updates after putaway.
 6. Create a picking task using the exact product name and SKU.
 7. The system checks available stock and subtracts the picked quantity.
 8. Pack the same order/product.

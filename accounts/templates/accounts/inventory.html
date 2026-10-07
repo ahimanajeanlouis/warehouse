@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventory</title>
 
-  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}?v=2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -13,7 +14,7 @@
 <div class="layout">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="warehouse-sidebar">
 
     <div class="brand">
       <i class="fa-solid fa-warehouse"></i>
@@ -38,6 +39,7 @@
 
   <!-- MAIN -->
   <main class="main">
+    {% include 'accounts/mobile_navigation.html' %}
 
     <header class="topbar">
       <div>
@@ -45,34 +47,13 @@
         <p>Track all warehouse stock in real time</p>
       </div>
     </header>
-    <section class="panel">
-
-  <h3>Add New Product</h3>
-
-  {% if messages %}
-    {% for message in messages %}
-      <p class="msg">{{ message }}</p>
-    {% endfor %}
-  {% endif %}
-
-  <form method="POST">
-    {% csrf_token %}
-
-    <label>Product Name</label>
-    {{ form.name }}
-    
-
-    <label>SKU</label>
-    {{ form.sku }}
-
-    <label>Quantity</label>
-    {{ form.quantity }}
-
-    <button type="submit">Save Product</button>
-
-  </form>
-
-</section>
+    {% if messages %}
+      <section class="panel">
+        {% for message in messages %}
+          <p class="msg">{{ message }}</p>
+        {% endfor %}
+      </section>
+    {% endif %}
 
     <!-- LOW STOCK ALERT -->
     {% if low_stock %}

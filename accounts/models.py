@@ -69,6 +69,7 @@ class Receiving(models.Model):
     received_date = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, default='RECEIVED')
+    inventory_updated = models.BooleanField(default=False)
 
     def total_price(self):
         return self.quantity * self.unit_price   
@@ -127,4 +128,3 @@ class Shipping(models.Model):
 
     def __str__(self):
         return self.order_ref
-

@@ -11,7 +11,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import (
     PackingForm,
     PickingForm,
-    ProductForm,
     PutawayForm,
     ReceivingForm,
     ShippingForm,
@@ -130,33 +129,14 @@ def dashboard(request):
 # =========================
 
 @login_required(login_url="login")
-def add_product(request):
-    form = ProductForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Product added successfully.")
-        return redirect("inventory")
-
-    return render(request, "accounts/add_product.html", {"form": form})
-
-
-@login_required(login_url="login")
 def inventory_page(request):
-    form = ProductForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Product added successfully.")
-        return redirect("inventory")
-
     products = Product.objects.all().order_by("name")
     low_stock = Product.objects.filter(quantity__lte=5).order_by("quantity", "name")
 
     return render(
         request,
         "accounts/inventory.html",
-        {"form": form, "products": products, "low_stock": low_stock},
+        {"products": products, "low_stock": low_stock},
     )
 
 
@@ -171,19 +151,6 @@ def receiving_page(request):
     if request.method == "POST" and form.is_valid():
         with transaction.atomic():
             data = form.save()
-
-            # Good received stock becomes available inventory immediately.
-            # Damaged goods remain in the receiving history but are not added
-            # to usable stock.
-            if data.condition == Receiving.CONDITION_GOOD:
-                product, _ = Product.objects.get_or_create(
-                    sku=data.sku,
-                    defaults={"name": data.product_name, "quantity": 0},
-                )
-                product.name = data.product_name
-                product.quantity += data.quantity
-                product.save(update_fields=["name", "quantity"])
-
             WarehouseActivity.objects.create(
                 activity_type="RECEIVING",
                 reference=f"RCV-{data.sku}",
@@ -208,23 +175,47 @@ def receiving_page(request):
 @login_required(login_url="login")
 def putaway_page(request):
     form = PutawayForm(request.POST or None)
-    form.fields["receiving"].queryset = Receiving.objects.filter(status="RECEIVED")
 
     if request.method == "POST" and form.is_valid():
-        putaway = form.save(commit=False)
-        putaway.status = "STORED"
-        putaway.save()
+        with transaction.atomic():
+            receiving = Receiving.objects.select_for_update().get(
+                pk=form.cleaned_data["receiving"].pk
+            )
+            if (
+                receiving.status != "RECEIVED"
+                or receiving.condition != Receiving.CONDITION_GOOD
+            ):
+                form.add_error(
+                    "receiving",
+                    "This receiving record is no longer available for putaway.",
+                )
+            else:
+                putaway = form.save(commit=False)
+                putaway.receiving = receiving
+                putaway.status = "STORED"
+                putaway.save()
 
-        putaway.receiving.status = "STORED"
-        putaway.receiving.save(update_fields=["status"])
+                receiving.status = "STORED"
+                receiving.save(update_fields=["status"])
 
-        WarehouseActivity.objects.create(
-            activity_type="PUTAWAY",
-            reference=f"PUT-{putaway.receiving.sku}",
-            status="COMPLETED",
-        )
-        messages.success(request, "Product stored successfully.")
-        return redirect("putaway")
+                if not receiving.inventory_updated:
+                    product, _ = Product.objects.get_or_create(
+                        sku=receiving.sku,
+                        defaults={"name": receiving.product_name, "quantity": 0},
+                    )
+                    product.name = receiving.product_name
+                    product.quantity += receiving.quantity
+                    product.save(update_fields=["name", "quantity"])
+                    receiving.inventory_updated = True
+                    receiving.save(update_fields=["inventory_updated"])
+
+                WarehouseActivity.objects.create(
+                    activity_type="PUTAWAY",
+                    reference=f"PUT-{receiving.sku}",
+                    status="COMPLETED",
+                )
+                messages.success(request, "Product stored and inventory updated.")
+                return redirect("putaway")
 
     records = Putaway.objects.select_related("receiving").all().order_by("-created_at")
     return render(request, "accounts/putaway.html", {"form": form, "records": records})
@@ -239,27 +230,29 @@ def picking_page(request):
     form = PickingForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        sku = form.cleaned_data["sku"].strip()
         quantity = form.cleaned_data["quantity"]
+        selected_product = form.cleaned_data["product"]
 
         with transaction.atomic():
             try:
-                product = Product.objects.select_for_update().get(sku__iexact=sku)
+                product = Product.objects.select_for_update().get(pk=selected_product.pk)
             except Product.DoesNotExist:
-                form.add_error("sku", "No inventory product exists with this SKU.")
+                form.add_error("product", "This inventory product is no longer available.")
             else:
-                if product.quantity < quantity:
+                if product.quantity <= 0:
+                    form.add_error("product", "This product is out of stock.")
+                elif product.quantity < quantity:
                     form.add_error(
                         "quantity",
                         f"Insufficient stock. Available quantity: {product.quantity}.",
                     )
-                elif product.name.strip().lower() != form.cleaned_data["product_name"].strip().lower():
-                    form.add_error(
-                        "product_name",
-                        f"SKU {product.sku} belongs to '{product.name}'.",
-                    )
                 else:
-                    data = form.save()
+                    data = Picking.objects.create(
+                        product_name=product.name,
+                        sku=product.sku,
+                        quantity=quantity,
+                        order_reference=form.cleaned_data["order_reference"],
+                    )
                     product.quantity -= quantity
                     product.save(update_fields=["quantity"])
 
@@ -284,7 +277,10 @@ def picking_page(request):
 
 @login_required(login_url="login")
 def packing_page(request):
-    form = PackingForm(request.POST or None)
+    form = PackingForm(
+        request.POST if request.method == "POST" else None,
+        initial={"order_ref": request.GET.get("order_ref", "")},
+    )
 
     if request.method == "POST" and form.is_valid():
         order_ref = form.cleaned_data["order_ref"].strip()
@@ -331,7 +327,10 @@ def packing_page(request):
 
 @login_required(login_url="login")
 def shipping_page(request):
-    form = ShippingForm(request.POST or None)
+    form = ShippingForm(
+        request.POST if request.method == "POST" else None,
+        initial={"order_ref": request.GET.get("order_ref", "")},
+    )
 
     if request.method == "POST" and form.is_valid():
         order_ref = form.cleaned_data["order_ref"].strip()

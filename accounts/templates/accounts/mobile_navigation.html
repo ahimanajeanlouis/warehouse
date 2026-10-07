@@ -1,0 +1,35 @@
+<div class="mobile-topbar">
+  <button class="menu-toggle" type="button" aria-label="Open navigation menu"
+          aria-controls="warehouse-sidebar" aria-expanded="false">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+  <div class="mobile-brand"><i class="fa-solid fa-warehouse"></i> Warehouse System</div>
+</div>
+<button class="sidebar-backdrop" type="button" aria-label="Close navigation menu" tabindex="-1"></button>
+<script>
+  const menuToggle = document.querySelector(".menu-toggle");
+  const sidebarBackdrop = document.querySelector(".sidebar-backdrop");
+
+  if (menuToggle && sidebarBackdrop) {
+    function setMenuOpen(isOpen) {
+      document.body.classList.toggle("wms-menu-open", isOpen);
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+      menuToggle.setAttribute(
+        "aria-label",
+        isOpen ? "Close navigation menu" : "Open navigation menu"
+      );
+      menuToggle.innerHTML = `<i class="fa-solid fa-${isOpen ? "xmark" : "bars"}"></i>`;
+    }
+
+    menuToggle.addEventListener("click", () => {
+      setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true");
+    });
+    sidebarBackdrop.addEventListener("click", () => setMenuOpen(false));
+    document.querySelectorAll("#warehouse-sidebar .menu a").forEach((link) => {
+      link.addEventListener("click", () => setMenuOpen(false));
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    });
+  }
+</script>

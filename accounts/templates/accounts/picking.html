@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Picking Module</title>
 
-  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'accounts/styles.css' %}?v=2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -13,7 +14,7 @@
 <div class="layout">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="warehouse-sidebar">
 
     <div class="brand">
       <i class="fa-solid fa-hand-pointer"></i>
@@ -38,6 +39,7 @@
 
   <!-- MAIN -->
   <main class="main">
+    {% include 'accounts/mobile_navigation.html' %}
 
     <header class="topbar">
       <div>
@@ -61,17 +63,23 @@
         {% csrf_token %}
         {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
 
-        <label>Product Name</label>
-        {{ form.product_name }}
-
-        <label>SKU</label>
-        {{ form.sku }}
+        <label for="{{ form.product.id_for_label }}">Product Name / SKU</label>
+        {{ form.product }}
+        {% if form.product.errors %}
+          <div class="error">{{ form.product.errors }}</div>
+        {% endif %}
 
         <label>Quantity</label>
         {{ form.quantity }}
+        {% if form.quantity.errors %}
+          <div class="error">{{ form.quantity.errors }}</div>
+        {% endif %}
 
         <label>Order Reference</label>
         {{ form.order_reference }}
+        {% if form.order_reference.errors %}
+          <div class="error">{{ form.order_reference.errors }}</div>
+        {% endif %}
 
         <button type="submit">Start Picking</button>
       </form>
