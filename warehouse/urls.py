@@ -1,8 +1,21 @@
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('accounts.urls')),
-    
+    path("", views.login_page, name="login"),
+    path("register/", views.register_page, name="register"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+    path("logout/", views.logout_page, name="logout"),
+    path("receiving/", views.receiving_page, name="receiving"),
+    path("putaway/", views.putaway_page, name="putaway"),
+    path("inventory/", views.inventory_page, name="inventory"),
+    path("picking/", views.picking_page, name="picking"),
+    path("packing/", views.packing_page, name="packing"),
+    path("shipping/", views.shipping_page, name="shipping"),
+    path("orders/", views.orders_page, name="orders"),
+    path("suppliers/", views.suppliers_page, name="suppliers"),
+    path("customers/", views.customers_page, name="customers"),
+    path("locations/", views.locations_page, name="locations"),
+    path("stock-movements/", views.stock_movements_page, name="stock_movements"),
 ]

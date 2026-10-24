@@ -79,7 +79,6 @@ class Location(models.Model):
 # WAREHOUSE ACTIVITIES
 # =========================
 class WarehouseActivity(models.Model):
-
     ACTIVITY_TYPES = [
         ("RECEIVING", "Receiving"),
         ("PUTAWAY", "Putaway"),
@@ -150,110 +149,18 @@ class Receiving(models.Model):
         choices=CONDITION_CHOICES,
         default=CONDITION_GOOD,
     )
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
+    supplier = models.ForeignKey(
+        Supplier,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     batch_number = models.CharField(max_length=50, blank=True, default="")
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
     recipient = models.CharField(max_length=100, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier, supplier_name, supplier_contact = None, "", ""
-    supplier = models.ForeignKey(Supplier, on_delete=models.SET_NULL, null=True, blank=True)
-    supplier_name = models.CharField(max_length=150, blank=True, default="")
-    supplier_contact = models.CharField(max_length=150, blank=True, default="")
-    received_date = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, default="RECEIVED")
     inventory_updated = models.BooleanField(default=False)
+    received_date = models.DateTimeField(auto_now_add=True)
 
     def total_price(self):
         return self.quantity * self.unit_price
@@ -347,6 +254,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.order.order_number} - {self.product.name}"
-
-
-# Duplicate ForeignKey lines were intentionally removed from the final version.
