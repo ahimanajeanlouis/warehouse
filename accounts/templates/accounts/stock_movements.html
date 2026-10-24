@@ -1,0 +1,45 @@
+{% extends 'accounts/base_layout.html' %}
+
+{% block title %}Stock Movements{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <h3>Stock Movements</h3>
+    <a href="{% url 'dashboard' %}" class="button secondary">Back to dashboard</a>
+  </div>
+
+  {% if movements %}
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Movement</th>
+        <th>Quantity</th>
+        <th>Reference</th>
+        <th>Location</th>
+        <th>Notes</th>
+        <th>Created By</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for movement in movements %}
+      <tr>
+        <td>{{ movement.product.name }}</td>
+        <td>{{ movement.movement_type }}</td>
+        <td>{{ movement.quantity }}</td>
+        <td>{{ movement.reference|default:'-' }}</td>
+        <td>{{ movement.location.code|default:'-' }}</td>
+        <td>{{ movement.notes|default:'-' }}</td>
+        <td>{{ movement.created_by.username|default:'System' }}</td>
+        <td>{{ movement.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No stock movements recorded yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

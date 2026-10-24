@@ -1,6 +1,17 @@
 from django import forms
 from django.db.models import Sum
-from .models import Packing, Picking, Product, Putaway, Receiving, Shipping
+
+from .models import (
+    Customer,
+    Location,
+    Packing,
+    Picking,
+    Product,
+    Putaway,
+    Receiving,
+    Shipping,
+    Supplier,
+)
 
 
 class StyledModelForm(forms.ModelForm):
@@ -11,17 +22,34 @@ class StyledModelForm(forms.ModelForm):
 
 
 class ReceivingForm(StyledModelForm):
+    supplier = forms.ModelChoiceField(
+        queryset=Supplier.objects.none(),
+        required=False,
+        label="Supplier",
+    )
+
     class Meta:
         model = Receiving
         fields = [
-            "product_name", "sku", "quantity", "unit_price",
-            "supplier", "expiry_date", "condition",
+            "product_name",
+            "sku",
+            "quantity",
+            "unit_price",
+            "supplier",
+            "batch_number",
+            "recipient",
+            "expiry_date",
+            "condition",
         ]
         widgets = {
             "quantity": forms.NumberInput(attrs={"min": 1}),
             "unit_price": forms.NumberInput(attrs={"min": 0, "step": "0.01"}),
             "expiry_date": forms.DateInput(attrs={"type": "date"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["supplier"].queryset = Supplier.objects.order_by("name")
 
     def clean_quantity(self):
         value = self.cleaned_data["quantity"]
@@ -37,6 +65,11 @@ class ReceivingForm(StyledModelForm):
 
 
 class PutawayForm(StyledModelForm):
+    location = forms.ModelChoiceField(
+        queryset=Location.objects.none(),
+        label="Storage location",
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["receiving"].queryset = Receiving.objects.filter(
@@ -44,6 +77,7 @@ class PutawayForm(StyledModelForm):
             condition=Receiving.CONDITION_GOOD,
         ).order_by("-received_date")
         self.fields["receiving"].label_from_instance = self.receiving_label
+        self.fields["location"].queryset = Location.objects.filter(is_active=True).order_by("code")
 
     @staticmethod
     def receiving_label(receiving):
@@ -54,8 +88,8 @@ class PutawayForm(StyledModelForm):
         fields = ["receiving", "location"]
 
     def clean_location(self):
-        value = self.cleaned_data["location"].strip()
-        if not value:
+        value = self.cleaned_data["location"]
+        if value is None:
             raise forms.ValidationError("Storage location is required.")
         return value
 
@@ -68,9 +102,7 @@ class PickingForm(StyledModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["product"].queryset = Product.objects.filter(
-            quantity__gt=0,
-        ).order_by("name")
+        self.fields["product"].queryset = Product.objects.filter(quantity__gt=0).order_by("name")
         self.fields["product"].label_from_instance = self.product_label
 
     @staticmethod
@@ -99,15 +131,11 @@ class PackingForm(StyledModelForm):
         super().__init__(*args, **kwargs)
         picked = {
             (row["order_reference"], row["sku"]): row["quantity"]
-            for row in Picking.objects.values("order_reference", "sku").annotate(
-                quantity=Sum("quantity")
-            )
+            for row in Picking.objects.values("order_reference", "sku").annotate(quantity=Sum("quantity"))
         }
         packed = {
             (row["order_ref"], row["product__sku"]): row["quantity"]
-            for row in Packing.objects.values("order_ref", "product__sku").annotate(
-                quantity=Sum("quantity")
-            )
+            for row in Packing.objects.values("order_ref", "product__sku").annotate(quantity=Sum("quantity"))
         }
         remaining = {
             key: quantity - packed.get(key, 0)
@@ -122,17 +150,13 @@ class PackingForm(StyledModelForm):
             "this.form.method='get'; this.form.submit()"
         )
 
-        selected_order = self.data.get(self.add_prefix("order_ref")) or self.initial.get(
-            "order_ref"
-        )
+        selected_order = self.data.get(self.add_prefix("order_ref")) or self.initial.get("order_ref")
         products_remaining = {
             sku: quantity
             for (order_ref, sku), quantity in remaining.items()
             if order_ref == selected_order
         }
-        self.fields["product"].queryset = Product.objects.filter(
-            sku__in=products_remaining,
-        ).order_by("name")
+        self.fields["product"].queryset = Product.objects.filter(sku__in=products_remaining).order_by("name")
         self.fields["product"].label_from_instance = (
             lambda product: (
                 f"{product.name} — SKU {product.sku} — "
@@ -161,15 +185,11 @@ class ShippingForm(StyledModelForm):
         super().__init__(*args, **kwargs)
         packed = {
             (row["order_ref"], row["product__sku"]): row["quantity"]
-            for row in Packing.objects.values("order_ref", "product__sku").annotate(
-                quantity=Sum("quantity")
-            )
+            for row in Packing.objects.values("order_ref", "product__sku").annotate(quantity=Sum("quantity"))
         }
         shipped = {
             (row["order_ref"], row["product__sku"]): row["quantity"]
-            for row in Shipping.objects.values("order_ref", "product__sku").annotate(
-                quantity=Sum("quantity")
-            )
+            for row in Shipping.objects.values("order_ref", "product__sku").annotate(quantity=Sum("quantity"))
         }
         remaining = {
             key: quantity - shipped.get(key, 0)
@@ -184,17 +204,13 @@ class ShippingForm(StyledModelForm):
             "this.form.method='get'; this.form.submit()"
         )
 
-        selected_order = self.data.get(self.add_prefix("order_ref")) or self.initial.get(
-            "order_ref"
-        )
+        selected_order = self.data.get(self.add_prefix("order_ref")) or self.initial.get("order_ref")
         products_remaining = {
             sku: quantity
             for (order_ref, sku), quantity in remaining.items()
             if order_ref == selected_order
         }
-        self.fields["product"].queryset = Product.objects.filter(
-            sku__in=products_remaining,
-        ).order_by("name")
+        self.fields["product"].queryset = Product.objects.filter(sku__in=products_remaining).order_by("name")
         self.fields["product"].label_from_instance = (
             lambda product: (
                 f"{product.name} — SKU {product.sku} — "
@@ -221,3 +237,21 @@ class ShippingForm(StyledModelForm):
         if not value:
             raise forms.ValidationError("Destination is required.")
         return value
+
+
+class SupplierForm(StyledModelForm):
+    class Meta:
+        model = Supplier
+        fields = ["name", "contact_person", "email", "phone", "address"]
+
+
+class CustomerForm(StyledModelForm):
+    class Meta:
+        model = Customer
+        fields = ["name", "contact_person", "email", "phone", "address"]
+
+
+class LocationForm(StyledModelForm):
+    class Meta:
+        model = Location
+        fields = ["code", "name", "warehouse", "zone", "aisle", "rack", "bin", "capacity", "is_active"]
