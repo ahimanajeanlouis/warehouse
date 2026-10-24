@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: warehouse-system
+    env: python
+    buildCommand: pip install -r requirements.txt && python manage.py migrate
+    startCommand: gunicorn warehouse.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: TIME_ZONE
+        value: Africa/Kigali
+      - key: DATABASE_URL
+        sync: false
